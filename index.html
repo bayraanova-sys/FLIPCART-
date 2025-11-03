@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <title>Flip Grid with Countdown & Text</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      background: #f3f4f6;
+      font-family: Inter, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 210px);
+      grid-gap: 24px;
+    }
+    .card {
+      perspective: 1200px;
+    }
+    .inner {
+      position: relative;
+      width: 210px;
+      height: 210px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      border-radius: 16px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+    .inner.flipped {
+      transform: rotateY(180deg);
+    }
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 36px;
+      backface-visibility: hidden;
+    }
+    .front { color: #fff; display: flex; align-items: center; justify-content: center; }
+    .back {
+      background: #1f2937;
+      color: #fff;
+      transform: rotateY(180deg);
+      font-size: 24px;
+      text-align: center;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+    }
+    .countdown {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 16px;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* Баганаар ялгах өнгө */
+    .col1 .front { background: #86efac; color: #065f46; } /* 10 */
+    .col2 .front { background: #93c5fd; color: #1e3a8a; } /* 20 */
+    .col3 .front { background: #fca5a5; color: #7f1d1d; } /* 30 */
+  </style>
+</head>
+<body>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const cols = [10, 20, 30];
+
+    // 3x3 карт үүсгэх
+    for (let y = 3; y >= 1; y--) {
+      for (let x = 1; x <= 3; x++) {
+        const id = `${x}-${y}`;
+        const col = `col${x}`;
+        const card = document.createElement("div");
+        card.className = `card ${col}`;
+        card.innerHTML = `
+          <div class="inner" id="card-${id}" data-id="${id}">
+            <div class="face front">${cols[x-1]}</div>
+            <div class="face back">
+              (${x},${y})
+              <span class="countdown">30</span>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      }
+    }
+
+    // Карт дарахад
+    document.querySelectorAll(".inner").forEach(el => {
+      el.addEventListener("click", () => {
+        if (el.classList.contains("flipped")) return;
+        el.classList.add("flipped");
+
+        const countdownEl = el.querySelector(".countdown");
+        let countdown = 30;
+        countdownEl.textContent = countdown;
+
+        const interval = setInterval(() => {
+          countdown--;
+          countdownEl.textContent = countdown;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            el.classList.remove("flipped");
+            countdownEl.textContent = 30; // reset
+          }
+        }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
+
